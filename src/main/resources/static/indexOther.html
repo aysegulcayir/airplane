@@ -1,0 +1,140 @@
+<html>
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.18/css/jquery.dataTables.css"/>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.js"></script>
+    <script type = "text/javascript">
+        $(document).ready(function () {
+            var airplane = {};
+            var dynamicURL = "";
+            var methodName = "";
+            getAllPlanes();
+            $('#btnAddPlane').click(function () {
+                airplane.currentAirport = $('#txtAirport').val();
+                airplane.typeOfAirPlane = $('#txtAirplane').val();
+                airplane.tankCondition = $('#txtTank').val();
+                var airplaneId = $('#txtId').val();
+                if(airplaneId){
+                    //update it
+                    dynamicURL = "http://localhost:8080/api/update/"+airplaneId;
+                    methodName = "PUT";
+                }else{
+                    //save it
+                    dynamicURL = "http://localhost:8080/api/airplane";
+                    methodName = "POST";
+                }
+                var airplaneObj = JSON.stringify(airplane);
+                $.ajax({
+                    url: dynamicURL,
+                    method: methodName,
+                    data: airplaneObj,
+                    contentType: 'application/json; charset=utf-8',
+                    success: function () {
+                        alert('Saved successfully');
+                        getAllPlanes();
+                        reset();
+                    },
+                    error: function (error) {
+                        alert(error);
+                    }
+                })
+            })
+        })
+
+        function getAllPlanes() {
+            $.ajax({
+                url: "http://localhost:8080/api/airplanes",
+                method: "GET",
+                dataType: "json",
+                success: function (data) {
+                    var tableBody = $('#tblBook tbody');
+                    tableBody.empty();
+                    $(data).each(function (index, element) {
+                        tableBody.append('<tr><td>'+element.typeOfAirPlane+'</td><td>'+element.currentAirport+'</td><td>'+element.tankCondition+'</td><td><button onclick = "update('+element.id+')">Update</button> | <button onclick = "deletePlane('+element.id+')">Delete</button></td></tr>');
+                    })
+                },
+                error: function (error) {
+                    alert(error);
+                }
+            })
+        }
+
+        function deletePlane(id){
+            $.ajax({
+                url: 'http://localhost:8080/api/delete/'+id,
+                method: 'DELETE',
+                success: function () {
+                    alert('record has been deleted');
+                    getAllPlanes();
+                },
+                error: function (error) {
+                    alert(error);
+                }
+            })
+        }
+
+        function update(id){
+            $.ajax({
+                url: 'http://localhost:8080/api/airplane/'+id,
+                method: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                $('#txtAirport').val(currentAirport);
+                 $('#txtAirplane').val(typeOfAirPlane);
+                 $('#txtTank').val(tankCondition);
+                 
+                $('#txtId').val(airplaneId);
+                    getAllPlanes();
+                },
+                error: function (error) {
+                    alert(error);
+                }
+            })
+        }
+
+        function reset(){
+            $('#txtAirport').val('');
+            $('#txtAirplane').val('');
+            $('#txtTank').val('');
+            $('#txtId').val('');
+        }
+    </script>
+</head>
+<body>
+<div>
+    <table>
+
+        <td><input type="text" id = "txtId" hidden></td>
+
+        <tr>
+            <td>Airplane</td>
+            <td><input type="text" id = "txtAirplane"></td>
+        </tr>
+        <tr>
+            <td>Airport</td>
+            <td><input type="text" id = "txtAirport"></td>
+        </tr>
+        <tr>
+            <td>Tank</td>
+            <td><input type="number" id = "txtTank"></td>
+        </tr>
+        <tr colspan = "3">
+            <td><input type="button" value="Add Airplane" id="btnAddPlane"></td>
+        </tr>
+    </table>
+    <table border = "1" id = "tblBook">
+        <thead>
+        <tr>
+            <th>Airplane</th>
+            <th>Airport</th>
+            <th>Tank </th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
