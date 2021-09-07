@@ -56,4 +56,15 @@ public class AirplaneService {
         Optional<Airplane> airplane = this.airplaneRepository.findById(id);
         this.airplaneRepository.delete(airplane.get());
     }
+    public Airplane setFlight(Airplane airplane) {
+        if (airplane.getTankCondition() < 2)
+            System.out.println("there is no enough fuel");
+        Optional<Airplane> airplaneOptional = airplaneRepository.findById(airplane.getAirplaneIdentification());
+        airplaneOptional.get().setCurrentAirport(airplane.getCurrentAirport());
+        return airplaneRepository.save(airplaneOptional.get());
+    }
+
+    public Iterable<Airplane> findAllAirplaneByType(String typeOfAirPlane) {
+        return this.airplaneRepository.findAllByTypeOfPlane(typeOfAirPlane);
+    }
 }

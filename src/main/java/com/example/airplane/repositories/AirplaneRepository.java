@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AirplaneRepository extends CrudRepository<Airplane, Long> {
+    Iterable<Airplane> findAllByTypeOfPlane(String name);
 }
